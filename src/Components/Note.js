@@ -6,35 +6,37 @@ class Note extends React.Component {
         super(props);
         this.state = {
             'set': false,
-            styles:{
-            backgroundColor:'white'}
+            styles: {
+                backgroundColor: 'white'
+            }
         };
 
         this.printData = this.printData.bind(this);
     }
 
-    
 
-    printData()
-    {
+
+    printData() {
         console.log(this.props.noteType, this.props.quarter);
     }
 
     render() {
 
-        const preventDefault = (e)=> e.preventDefault();
+        const preventDefault = (e) => e.preventDefault();
 
-        const handleClick= (event)=>{
+        const handleClick = (event) => {
             event.preventDefault();
-            if(event.button===0){
-                this.props.playFn(this.props.note);
-                this.setState({"set":1,styles:{backgroundColor:"#f500567a"}});
+            if (event.button === 0) {
+                this.props.playNote(this.props.note);
+                this.setState({ "set": 1, styles: { backgroundColor: "#f500567a" } });
+                this.props.addNote(this.props.bar, this.props.quarter, this.props.note);
             }
-            else if(event.button===2){
-                this.setState({"set":0,styles:{backgroundColor:"white"}});              
+            else if (event.button === 2) {
+                this.setState({ "set": 0, styles: { backgroundColor: "white" } });
+                this.props.removeNote(this.props.bar, this.props.quarter, this.props.note);
             }
         }
-        
+
         return (<div onContextMenu={preventDefault} onMouseDown={handleClick} style={this.state.styles}>
 
         </div>);

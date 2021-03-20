@@ -9,10 +9,10 @@ class Line extends React.Component {
     render() {
         return (
             <div className="line">
-                <Note bar={this.props.bar} note={this.props.note} quarter="1" playFn={this.props.playFn} />
-                <Note bar={this.props.bar} note={this.props.note} quarter="2" playFn={this.props.playFn} />
-                <Note bar={this.props.bar} note={this.props.note} quarter="3" playFn={this.props.playFn} />
-                <Note bar={this.props.bar} note={this.props.note} quarter="4" playFn={this.props.playFn} />
+                <Note bar={this.props.bar} note={this.props.note} quarter="1" playNote={this.props.playNote} addNote={this.props.addNote} removeNote={this.props.removeNote} />
+                <Note bar={this.props.bar} note={this.props.note} quarter="2" playNote={this.props.playNote} addNote={this.props.addNote} removeNote={this.props.removeNote} />
+                <Note bar={this.props.bar} note={this.props.note} quarter="3" playNote={this.props.playNote} addNote={this.props.addNote} removeNote={this.props.removeNote} />
+                <Note bar={this.props.bar} note={this.props.note} quarter="4" playNote={this.props.playNote} addNote={this.props.addNote} removeNote={this.props.removeNote} />
             </div>
         );
     }
