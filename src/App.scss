@@ -23,6 +23,10 @@
   }
 }
 
+.centerText{
+  text-align: center;
+}
+
 #buttons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -113,7 +117,7 @@
 
 .line {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(8,1fr);
   grid-template-rows: 1fr;
   div {
     border: 1px solid #f5005621;

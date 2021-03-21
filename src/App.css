@@ -35,6 +35,10 @@
           transform: translate(10px, 8px);
 }
 
+.centerText {
+  text-align: center;
+}
+
 #buttons {
   display: -ms-grid;
   display: grid;
@@ -149,8 +153,8 @@
 .line {
   display: -ms-grid;
   display: grid;
-  -ms-grid-columns: 1fr 1fr 1fr 1fr;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+  -ms-grid-columns: (1fr)[8];
+      grid-template-columns: repeat(8, 1fr);
   -ms-grid-rows: 1fr;
       grid-template-rows: 1fr;
 }
