@@ -6,7 +6,9 @@ import MusicSheet from './Components/MusicSheet';
 import SimpleModal from './Components/SimpleModal';
 import * as Tone from 'tone';
 
-class App extends Component {
+function App(props) {
+
+
 
   constructor(props) {
     super(props);
@@ -16,7 +18,7 @@ class App extends Component {
     this.state = {
       bars: 1,
       song: [{ time: "0:0:0", note: ["C5"] }],
-      prettySong:""
+      prettySong: ""
     }
 
     this.playNote = this.playNote.bind(this);
@@ -46,21 +48,22 @@ class App extends Component {
     this.part = new Tone.Part();
     this.synth = new Tone.PolySynth().toDestination();
 
+
   }
 
 
   /*Song logic */
-  playSong() {
+  const playSong= ()=> {
     Tone.Transport.position = 0;
     Tone.Transport.start();
 
   }
 
-  playNote(note) {
+  const playNote= (note)=> {
     this.sampler.triggerAttackRelease(note, "1n");
   }
 
-  updatePart() {
+  const updatePart=() =>{
     this.part.clear();
 
     this.part = new Tone.Part(
@@ -73,7 +76,7 @@ class App extends Component {
     this.setState({ song: this.song, prettySong: JSON.stringify(this.song) });
   }
 
-  removeNote(bar, quarter, sixteenth, note) {
+  const removeNote= (bar, quarter, sixteenth, note)=> {
     let position = `${bar}:${quarter}:${sixteenth}`;
 
     /*Search if the note is already on a chord */
@@ -91,7 +94,7 @@ class App extends Component {
     }
   }
 
-  addNote(bar, quarter, sixteenth, note) {
+  const addNote= (bar, quarter, sixteenth, note)=> {
     let position = `${bar}:${quarter}:${sixteenth}`;
 
     //Looking if there is already an array to puttin in
@@ -116,32 +119,29 @@ class App extends Component {
   /*Ui bar logic */
 
 
-  addBar() {
+  const addBar= ()=> {
     this.setState({ bars: this.state.bars + 1 });
   }
 
-  removeBar() {
+  const removeBar= ()=> {
     if (this.state.bars > 1)
       this.setState({ bars: this.state.bars - 1 });
   }
 
   //File logic
 
-  adjustBarNumber()
-  {
-    let maxBar=1;
-    for(let note of this.song)
-    {
-      let bar= parseInt(note.time[0]);
-      if(bar>maxBar)
-      {
-        maxBar=bar; 
+  const adjustBarNumber = () => {
+    let maxBar = 1;
+    for (let note of this.song) {
+      let bar = parseInt(note.time[0]);
+      if (bar > maxBar) {
+        maxBar = bar;
       }
     }
-    this.setState({bars:maxBar+1});
+    this.setState({ bars: maxBar + 1 });
   }
 
-  loadFile = async (e) => {
+  const loadFile = async (e) => {
     e.preventDefault()
     const reader = new FileReader()
     reader.onload = async (e) => {
@@ -155,70 +155,68 @@ class App extends Component {
     reader.readAsText(e.target.files[0]);
   }
 
-  onInputClick = (event) => {
+  const onInputClick = (event) => {
     event.target.value = ''
   }
 
-  showFile() {
+  const showFile = () => {
     let something = window.open("data:text/json," + encodeURIComponent({ "2": 3 }), "_blank");
     something.focus();
   }
 
-  render() {
-    return (
-      //Modal for JSON display
+  return (
+    //Modal for JSON display
 
 
-      <div className="App">
-        <div></div>
-        <div id="mainApp">
+    <div className="App">
+      <div></div>
+      <div id="mainApp">
 
 
-          <div id="editor" className="z-depth-1">
-            <div id="clefIcon">
-              <ClefIcon />
-            </div>
-
-            <div id="sheet">
-              <MusicSheet song={this.state.song} bars={this.state.bars} playSong={this.playSong}
-                playNote={this.playNote} addNote={this.addNote} removeNote={this.removeNote} />
-            </div>
+        <div id="editor" className="z-depth-1">
+          <div id="clefIcon">
+            <ClefIcon />
           </div>
 
-
-          <div id="buttons">
-            <div></div>
-            <div id="middleButtons">
-              <SimpleModal prettySong={this.state.prettySong}/>
-              <a onClick={this.playSong} className="btn-floating btn-large"><i className="material-icons">play_arrow</i></a>
-              <a onClick={this.showFile} className="btn-floating btn-large red" ><i className="material-icons">save</i></a>
-
-            </div>
-            <div id="rightButtons">
-              <a onClick={this.addBar} className="btn-floating btn-large red"><i className="material-icons">add</i></a>
-              <a onClick={this.removeBar} className="btn-floating btn-large red"><i className="material-icons">remove</i></a>
-            </div>
+          <div id="sheet">
+            <MusicSheet song={this.state.song} bars={this.state.bars} playSong={this.playSong}
+              playNote={this.playNote} addNote={this.addNote} removeNote={this.removeNote} />
           </div>
-
-
-
-          <div id="player" className="z-depth-1">
-            <div id="womanIcon">
-              <WomanIcon />
-            </div>
-            <div id="musicBox">
-
-            </div>
-          </div>
-
-          <input type="file" onClick={this.onInputClick} accept=".json" onChange={(e) => this.loadFile(e)}></input>
-
-
         </div>
-        <div></div>
+
+
+        <div id="buttons">
+          <div></div>
+          <div id="middleButtons">
+            <SimpleModal prettySong={this.state.prettySong} />
+            <a onClick={this.playSong} className="btn-floating btn-large"><i className="material-icons">play_arrow</i></a>
+            <a onClick={this.showFile} className="btn-floating btn-large red" ><i className="material-icons">save</i></a>
+
+          </div>
+          <div id="rightButtons">
+            <a onClick={this.addBar} className="btn-floating btn-large red"><i className="material-icons">add</i></a>
+            <a onClick={this.removeBar} className="btn-floating btn-large red"><i className="material-icons">remove</i></a>
+          </div>
+        </div>
+
+
+
+        <div id="player" className="z-depth-1">
+          <div id="womanIcon">
+            <WomanIcon />
+          </div>
+          <div id="musicBox">
+
+          </div>
+        </div>
+
+        <input type="file" onClick={this.onInputClick} accept=".json" onChange={(e) => this.loadFile(e)}></input>
+
+
       </div>
-    );
-  }
+      <div></div>
+    </div>
+  );
 }
 
 export default App;
