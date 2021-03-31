@@ -1,144 +1,136 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useRef } from 'react';
 import './App.css';
 import ClefIcon from './Components/ClefIcon';
 import WomanIcon from './Components/WomanIcon';
 import MusicSheet from './Components/MusicSheet';
 import SimpleModal from './Components/SimpleModal';
 import * as Tone from 'tone';
+import { ThemeProvider } from '@material-ui/styles';
+
+import InteractionContext from './Context/InteractionContext';
+
+
+Tone.Transport.bpm.value = 180;
+let song = [];//format [["bar:quarter",note]];
+
+let notes = ["A4"]
+
+let urls = { "A4": "A4.ogg", "D5": "D5.ogg", "F5": "F5.ogg" }
+
+
+let sampler = new Tone.Sampler({
+  urls: urls,
+  release: 1,
+  baseUrl: `${process.env.PUBLIC_URL}/instruments/musicBox/`,
+  onload: () => {
+    console.log("loaded");
+  }
+}).toDestination();
+
+let part = new Tone.Part();
+let synth = new Tone.PolySynth().toDestination();
+
 
 function App(props) {
 
+  const [bars, setBars] = useState(1);
+  const [stateSong, setSong] = useState([]);
+  const [prettySong, setPrettySong] = useState("");
 
-
-  constructor(props) {
-    super(props);
-    this.addBar = this.addBar.bind(this);
-    this.removeBar = this.removeBar.bind(this);
-
-    this.state = {
-      bars: 1,
-      song: [{ time: "0:0:0", note: ["C5"] }],
-      prettySong: ""
-    }
-
-    this.playNote = this.playNote.bind(this);
-    this.playSong = this.playSong.bind(this);
-    this.removeNote = this.removeNote.bind(this);
-    this.addNote = this.addNote.bind(this);
-    Tone.Transport.bpm.value = 160;
-    this.song = []//format [["bar:quarter",note]];
-
-    this.notes = ["A4"]
-
-    this.urls = {}
-    for (let note of this.notes) {
-      this.urls[note] = note + ".ogg";
-    }
-
-
-    this.sampler = new Tone.Sampler({
-      urls: this.urls,
-      release: 1,
-      baseUrl: `${process.env.PUBLIC_URL}/instruments/musicBox/`,
-      onload: () => {
-        console.log("loaded");
-      }
-    }).toDestination();
-
-    this.part = new Tone.Part();
-    this.synth = new Tone.PolySynth().toDestination();
-
-
-  }
 
 
   /*Song logic */
-  const playSong= ()=> {
+  const playSong = () => {
     Tone.Transport.position = 0;
     Tone.Transport.start();
 
   }
 
-  const playNote= (note)=> {
-    this.sampler.triggerAttackRelease(note, "1n");
+  const playNote = (note) => {
+    sampler.triggerAttackRelease(note, "1n");
   }
 
-  const updatePart=() =>{
-    this.part.clear();
+  const updatePart = () => {
 
-    this.part = new Tone.Part(
+    setSong(song);
+    part.clear();
+
+    part = new Tone.Part(
       (time, value) => {
         // the notes given as the second element in the array
         // will be passed in as the second argument
-        this.sampler.triggerAttackRelease(value.note, "1n", time);
-      }, this.song
+        sampler.triggerAttackRelease(value.note, "1n", time);
+      }, song
     ).start(0);
-    this.setState({ song: this.song, prettySong: JSON.stringify(this.song) });
+
+
+
+    setPrettySong(JSON.stringify(stateSong));
   }
 
-  const removeNote= (bar, quarter, sixteenth, note)=> {
+  const removeNote = (bar, quarter, sixteenth, note) => {
     let position = `${bar}:${quarter}:${sixteenth}`;
 
     /*Search if the note is already on a chord */
-    for (let i = 0; i < this.song.length; i++) {
-      let notes = this.song[i].note;
-      if (position === this.song[i].time && note.includes(note)) {
-        this.song[i].note = notes.filter((value, index) => index !== notes.indexOf(note));
-        this.song = this.song.filter((el, index) => el.note.length !== 0);
+    for (let i = 0; i < song.length; i++) {
+      let notes = song[i].note;
+      if (position === song[i].time && note.includes(note)) {
+        song[i].note = notes.filter((value, index) => index !== notes.indexOf(note));
+        song = song.filter((el, index) => el.note.length !== 0);
 
-        this.updatePart();
+        updatePart();
 
-        console.table(this.song);
         return;
       }
     }
   }
 
-  const addNote= (bar, quarter, sixteenth, note)=> {
+  const addNote = (bar, quarter, sixteenth, note) => {
     let position = `${bar}:${quarter}:${sixteenth}`;
 
     //Looking if there is already an array to puttin in
-    for (let i = 0; i < this.song.length; i++) {
-      if (position === this.song[i].time) {
-        if (!this.song[i].note.includes(note)) {
-          this.song[i].note.push(note);
+    for (let i = 0; i < song.length; i++) {
+      if (position === song[i].time) {
+        if (!song[i].note.includes(note)) {
+          song[i].note.push(note);
         }
+        /*Ensure song updating */
+        song = song.filter((el, index) => el.note.length !== 0);
+        updatePart();
 
-        this.updatePart();
-        console.table(this.song);
         return;
       }
     }
 
-    this.song.push({ time: position, note: [note] });
+    song.push({ time: position, note: [note] });
 
-    this.updatePart();
-    console.table(this.song);
+    updatePart();
+    return;
   }
 
   /*Ui bar logic */
 
 
-  const addBar= ()=> {
-    this.setState({ bars: this.state.bars + 1 });
+  const addBar = () => {
+    setBars(bars + 1);
   }
 
-  const removeBar= ()=> {
-    if (this.state.bars > 1)
-      this.setState({ bars: this.state.bars - 1 });
+  const removeBar = () => {
+    if (bars > 1)
+      setBars(bars - 1);
   }
 
   //File logic
 
   const adjustBarNumber = () => {
     let maxBar = 1;
-    for (let note of this.song) {
-      let bar = parseInt(note.time[0]);
-      if (bar > maxBar) {
-        maxBar = bar;
+    for (let note of song) {
+      let newBar = parseInt(note.time[0]);
+      if (newBar > maxBar) {
+        maxBar = newBar;
       }
     }
-    this.setState({ bars: maxBar + 1 });
+    setBars(maxBar + 1);
   }
 
   const loadFile = async (e) => {
@@ -147,21 +139,15 @@ function App(props) {
     reader.onload = async (e) => {
       let text = (e.target.result);
       text = JSON.parse(text);
-      console.table(text);
-      this.song = text;
-      this.adjustBarNumber();
-      this.updatePart();
+      song = text;
+      adjustBarNumber();
+      updatePart();
     };
     reader.readAsText(e.target.files[0]);
   }
 
   const onInputClick = (event) => {
     event.target.value = ''
-  }
-
-  const showFile = () => {
-    let something = window.open("data:text/json," + encodeURIComponent({ "2": 3 }), "_blank");
-    something.focus();
   }
 
   return (
@@ -178,9 +164,11 @@ function App(props) {
             <ClefIcon />
           </div>
 
-          <div id="sheet">
-            <MusicSheet song={this.state.song} bars={this.state.bars} playSong={this.playSong}
-              playNote={this.playNote} addNote={this.addNote} removeNote={this.removeNote} />
+          <div className="sheet">
+            <InteractionContext.Provider value="true">
+              <MusicSheet key="1" song={stateSong} bars={bars} playSong={playSong}
+                playNote={playNote} addNote={addNote} removeNote={removeNote} />
+            </InteractionContext.Provider>
           </div>
         </div>
 
@@ -188,14 +176,14 @@ function App(props) {
         <div id="buttons">
           <div></div>
           <div id="middleButtons">
-            <SimpleModal prettySong={this.state.prettySong} />
-            <a onClick={this.playSong} className="btn-floating btn-large"><i className="material-icons">play_arrow</i></a>
-            <a onClick={this.showFile} className="btn-floating btn-large red" ><i className="material-icons">save</i></a>
+            <SimpleModal prettySong={prettySong} />
+            <a onClick={playSong} className="btn-floating btn-large"><i className="material-icons">play_arrow</i></a>
+            <a className="btn-floating btn-large red" ><i className="material-icons">save</i></a>
 
           </div>
           <div id="rightButtons">
-            <a onClick={this.addBar} className="btn-floating btn-large red"><i className="material-icons">add</i></a>
-            <a onClick={this.removeBar} className="btn-floating btn-large red"><i className="material-icons">remove</i></a>
+            <a onClick={addBar} className="btn-floating btn-large red"><i className="material-icons">add</i></a>
+            <a onClick={removeBar} className="btn-floating btn-large red"><i className="material-icons">remove</i></a>
           </div>
         </div>
 
@@ -205,17 +193,22 @@ function App(props) {
           <div id="womanIcon">
             <WomanIcon />
           </div>
-          <div id="musicBox">
 
+          <div className="sheet">
+            <InteractionContext.Provider value="false">
+              <MusicSheet key="2" song={stateSong} bars={bars} playSong={playSong}
+                playNote={playNote} addNote={addNote} removeNote={removeNote} />
+            </InteractionContext.Provider>
           </div>
+
         </div>
 
-        <input type="file" onClick={this.onInputClick} accept=".json" onChange={(e) => this.loadFile(e)}></input>
+        <input type="file" onClick={onInputClick} accept=".json" onChange={(e) => loadFile(e)}></input>
 
 
       </div>
       <div></div>
-    </div>
+    </div >
   );
 }
 

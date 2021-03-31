@@ -1,7 +1,10 @@
 import React from 'react';
 import equal from 'fast-deep-equal'
+import InteractionContext from '../Context/InteractionContext'
 
 class Note extends React.Component {
+
+    static contextType = InteractionContext;
 
     constructor(props) {
         super(props);
@@ -21,11 +24,14 @@ class Note extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (!equal(this.props.song, prevProps.song)) {
+            console.table(prevProps.song);
             let active = false;
+            
             let color = "white";
             if (this.searchForActive()) {
                 active = true;
                 color = "#f500567a";
+
             }
             this.setState({
                 set: active,
@@ -40,6 +46,7 @@ class Note extends React.Component {
 
     searchForActive() {
         let time = `${this.props.bar}:${this.props.quarter}:${this.props.sixteenth}`;
+
         for (let chord of this.props.song) {
             if (chord.time === time && chord.note.includes(this.props.note)) {
                 return true;
@@ -61,6 +68,11 @@ class Note extends React.Component {
 
         const handleClick = (event) => {
             event.preventDefault();
+
+            if (this.context === "false") {
+                return;
+            }
+
             if (event.button === 0) {
                 this.props.playNote(this.props.note);
                 this.setState({ "set": 1, styles: { backgroundColor: "#f500567a" } });
@@ -71,8 +83,7 @@ class Note extends React.Component {
                 this.props.removeNote(this.props.bar, this.props.quarter, this.props.sixteenth, this.props.note);
             }
         }
-
-        return (<div onContextMenu={preventDefault} onMouseDown={handleClick} style={this.state.styles}>
+        return (<div onContextMenu={preventDefault} onMouseDown={handleClick} style={this.state.styles} >
 
         </div>);
     }

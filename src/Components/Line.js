@@ -1,11 +1,8 @@
 import React from 'react';
-import Note from './Note';
+import Note from './functionalNote';
 
 class Line extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
     render() {
         let notes = []
         let key = 0;

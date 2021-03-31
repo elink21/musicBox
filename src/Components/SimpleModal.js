@@ -43,7 +43,7 @@ export default function SimpleModal(props) {
     const body = (
         <div style={modalStyle} className={classes.paper}>
             
-            <h4 id="simple-modal-title" className="centerText">Sumimasen &lt;(＿　＿)&gt;</h4>
+            <h4 id="simple-modal-title" className="centerText">We're sorry 人(_ _*)</h4>
             <small>Since this is a serveless app, we can't provide you a direct download, but
                 you can still copy and paste your song as JSON file.
             </small>
