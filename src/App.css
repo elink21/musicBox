@@ -196,4 +196,61 @@
 .line div:hover {
   background-color: #f500567a;
 }
+
+#birthdayMessage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  overflow-y: scroll;
+  z-index: 1000;
+  background-image: -webkit-gradient(linear, left top, right top, from(#4facfe), to(#00f2fe));
+  background-image: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 8fr 1fr;
+      grid-template-columns: 1fr 8fr 1fr;
+  -ms-grid-rows: 3fr 8fr 3fr;
+      grid-template-rows: 3fr 8fr 3fr;
+      grid-template-areas: ". titleSVG ." ". message ." ". button .";
+}
+
+#titleSVG {
+  -ms-grid-row: 1;
+  -ms-grid-column: 2;
+  grid-area: titleSVG;
+}
+
+#svgGift {
+  height: 200px;
+  width: 200px;
+}
+
+#message {
+  text-align: center;
+  -ms-grid-row: 2;
+  -ms-grid-column: 2;
+  grid-area: message;
+}
+
+#message p {
+  font-size: 24px;
+}
+
+#message h4 {
+  text-align: center;
+}
+
+#message small {
+  text-align: left;
+}
+
+#closeButton {
+  -ms-grid-row: 3;
+  -ms-grid-column: 2;
+  grid-area: button;
+}
 /*# sourceMappingURL=App.css.map */

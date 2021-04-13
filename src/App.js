@@ -1,19 +1,17 @@
-import React, { Component, useState, useRef } from 'react';
+import React, { Component, useState, useEffect, useRef } from 'react';
 import './App.css';
 import ClefIcon from './Components/ClefIcon';
 import WomanIcon from './Components/WomanIcon';
 import MusicSheet from './Components/MusicSheet';
 import SimpleModal from './Components/SimpleModal';
+import BirthdayMessage from './Components/BirthdayMessage'
 import * as Tone from 'tone';
-import { ThemeProvider } from '@material-ui/styles';
 
 import InteractionContext from './Context/InteractionContext';
 
 
 Tone.Transport.bpm.value = 180;
-let song = [];//format [["bar:quarter",note]];
 
-let notes = ["A4"]
 
 let urls = { "A4": "A4.ogg", "D5": "D5.ogg", "F5": "F5.ogg" }
 
@@ -28,15 +26,14 @@ let sampler = new Tone.Sampler({
 }).toDestination();
 
 let part = new Tone.Part();
-let synth = new Tone.PolySynth().toDestination();
-
+let song = [];
 
 function App(props) {
 
   const [bars, setBars] = useState(1);
   const [stateSong, setSong] = useState([]);
   const [prettySong, setPrettySong] = useState("");
-
+  const [loading, setLoading] = useState(false);
 
 
   /*Song logic */
@@ -150,6 +147,13 @@ function App(props) {
     event.target.value = ''
   }
 
+
+  useEffect(() => {
+    setLoading(true);
+    adjustBarNumber();
+    updatePart();
+  }, []);
+
   return (
     //Modal for JSON display
 
@@ -157,7 +161,6 @@ function App(props) {
     <div className="App">
       <div></div>
       <div id="mainApp">
-
 
         <div id="editor" className="z-depth-1">
           <div id="clefIcon">
@@ -174,11 +177,22 @@ function App(props) {
 
 
         <div id="buttons">
-          <div></div>
+          <div>
+            <div class="file-field input-field">
+              <div class="btn pink accent-3">
+                <span>File</span>
+                <input type="file" onClick={onInputClick} accept=".json" onChange={(e) => loadFile(e)} />
+              </div>
+              <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" />
+              </div>
+            </div>
+          </div>
           <div id="middleButtons">
             <SimpleModal prettySong={prettySong} />
             <a onClick={playSong} className="btn-floating btn-large"><i className="material-icons">play_arrow</i></a>
-            <a className="btn-floating btn-large red" ><i className="material-icons">save</i></a>
+
+
 
           </div>
           <div id="rightButtons">
@@ -203,11 +217,8 @@ function App(props) {
 
         </div>
 
-        <input type="file" onClick={onInputClick} accept=".json" onChange={(e) => loadFile(e)}></input>
-
-
       </div>
-      <div></div>
+      < div ></div>
     </div >
   );
 }
